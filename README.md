@@ -70,6 +70,12 @@ previous console output.
 ## Technical Details
 Because `playwright run-server` is limited in terms of options, this project
 provides a custom server executable which wraps the Playwright API.
+
+Dependencies are regularly updated by Renovate. `playwright-core` package for
+the Playwright server is updated using a maintenance script (`update.bash`), to
+match the requirement of the MCP server. When the npm lock file is changed, the
+maintainer manually merges the PR, because Renovate Bot doesn't automatically
+merge PRs that have been committed further by other parties.
 ## Credits
 To initially make Playwright run on NixOS, I followed [a thread on the NixOS
 Discourse](https://discourse.nixos.org/t/running-playwright-tests/25655/). The
