@@ -6,6 +6,6 @@
   "license": "MIT",
   "keywords": [],
   "dependencies": {
-    "@playwright/mcp": "^0.0.53"
+    "@playwright/mcp": "^0.0.54"
   }
 }
