@@ -1,0 +1,56 @@
+name: "Update flake.lock"
+
+on:
+  schedule:
+    - cron: '0 4 * * 5'
+  workflow_dispatch:
+
+concurrency:
+  group: ${{ github.workflow }}-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  update:
+    runs-on: ubuntu-latest
+
+    permissions:
+      contents: read
+
+    steps:
+      - uses: actions/create-github-app-token@v3
+        id: generate-token
+        with:
+          app-id: ${{ secrets.CREATE_PR_APP_ID }}
+          private-key: ${{ secrets.CREATE_PR_APP_PRIVATE_KEY }}
+          permission-contents: write
+          permission-pull-requests: write
+
+      - uses: actions/checkout@de0fac2e4500dabe0009e67214ff5f5447ce83dd # v6
+
+      - uses: cachix/install-nix-action@4e002c8ec80594ecd40e759629461e26c8abed15 # v31
+        with:
+          extra_nix_config: |
+            access-tokens = github.com=${{ secrets.GITHUB_TOKEN }}
+
+      - name: Update flake.lock files
+        run: nix flake update
+
+      - uses: peter-evans/create-pull-request@5f6978faf089d4d20b00c7766989d076bb2fc7f1 # v8
+        id: cpr
+        with:
+          commit-message: 'chore(nix): Update flake.lock'
+          # Use the GitHub App installation token generated above so this can
+          # trigger other workflows
+          token: ${{ steps.generate-token.outputs.token }}
+          base: master
+          title: 'Update flake.lock'
+          branch: create-pull-request/update-flake-lock
+          labels: automation,update
+
+      - name: Auto-merge
+        if: steps.cpr.outputs.pull-request-operation == 'created'
+        run: |
+          gh pr merge ${{ steps.cpr.outputs.pull-request-number }} \
+            --delete-branch --merge --auto
+        env:
+          GH_TOKEN: ${{ steps.generate-token.outputs.token }}
