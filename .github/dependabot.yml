@@ -1,0 +1,36 @@
+version: 2
+
+updates:
+  - package-ecosystem: github-actions
+    directory: /
+    schedule:
+      interval: daily
+    labels:
+      - automation
+      - dependencies
+    groups:
+      actions:
+        patterns:
+          - "*"
+
+  - package-ecosystem: npm
+    directory: /
+    schedule:
+      interval: daily
+    labels:
+      - automation
+      - dependencies
+    ignore:
+      - dependency-name: playwright-core
+    groups:
+      patches:
+        patterns:
+          - "*"
+        update-types:
+          - minor
+          - patch
+      majors:
+        patterns:
+          - "*"
+    cooldown:
+      default-days: 5
