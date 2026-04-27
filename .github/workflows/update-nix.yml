@@ -39,8 +39,8 @@ jobs:
         id: cpr
         with:
           commit-message: 'chore(nix): Update flake.lock'
-          # Use a fine-grained personal access token that can trigger other
-          # workflows
+          # Use the GitHub App installation token generated above so this can
+          # trigger other workflows
           token: ${{ steps.generate-token.outputs.token }}
           base: master
           title: 'Update flake.lock'
