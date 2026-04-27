@@ -11,13 +11,12 @@ concurrency:
   group: ${{ github.workflow }}-${{ github.ref }}
   cancel-in-progress: true
 
+permissions:
+  contents: write
+
 jobs:
   update:
     runs-on: ubuntu-latest
-
-    permissions:
-      # permissions the default GITHUB_TOKEN write permission to commit and push the changed files back to the repository.
-      contents: write
 
     steps:
       - uses: actions/checkout@8e8c483db84b4bee98b60c0593521ed34d9990e8 # v6
