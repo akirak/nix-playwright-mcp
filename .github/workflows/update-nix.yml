@@ -17,7 +17,7 @@ jobs:
     runs-on: ubuntu-latest
 
     steps:
-      - uses: actions/create-github-app-token@v3
+      - uses: actions/create-github-app-token@7989d206df2ffdd9fc88b0eb6d2f0eebee835fd6 # v3
         id: generate-token
         with:
           app-id: ${{ secrets.CREATE_PR_APP_ID }}
