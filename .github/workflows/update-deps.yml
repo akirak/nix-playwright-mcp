@@ -13,19 +13,18 @@ concurrency:
 
 jobs:
   update:
-    strategy:
-      matrix:
-        os:
-          - ubuntu-latest
-    runs-on: ${{ matrix.os }}
+    runs-on: ubuntu-latest
+
     permissions:
       # Give the default GITHUB_TOKEN write permission to commit and push the changed files back to the repository.
       contents: write
+      pull-requests: write
+
     steps:
       - uses: actions/checkout@8e8c483db84b4bee98b60c0593521ed34d9990e8 # v6
         with:
           ref: ${{ github.head_ref }}
-          token: ${{ secrets.PAT }}
+          token: ${{ secrets.GITHUB_TOKEN }}
 
       - uses: cachix/install-nix-action@4e002c8ec80594ecd40e759629461e26c8abed15 # v31
         with:
