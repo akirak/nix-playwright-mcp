@@ -20,7 +20,7 @@ let
       playwright-driver.browsers;
 in
 buildNpmPackage {
-  pname = "mcp-server-playwright";
+  pname = "playwright-mcp";
   version = "unknown";
 
   src = ./.;
@@ -32,12 +32,10 @@ buildNpmPackage {
   dontNpmBuild = true;
 
   postInstall = ''
-    bin="$out/lib/node_modules/nix-playwright-server/node_modules/.bin"
+    bindir="$out/lib/node_modules/nix-playwright-server/node_modules/.bin"
 
-    executable="$(find -L '${browsers}' -name ${browserProgram} -type f)"
-
-    makeWrapper "$bin/mcp-server-playwright" $out/bin/mcp-server-playwright \
-      --chdir "$bin" \
+    makeWrapper $(realpath "$bindir/playwright-mcp") $out/bin/playwright-mcp \
+      --chdir "$bindir" \
       --add-flags "--executable-path '$executable'"
   '';
 
