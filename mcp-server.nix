@@ -27,7 +27,7 @@ let
 in
 buildNpmPackage {
   pname = "playwright-mcp";
-  src = ./.;
+  src = lib.cleanSource ./.;
   inherit version npmDepsHash;
 
   # The prepack script runs the build script, which we'd rather do in the build phase.
