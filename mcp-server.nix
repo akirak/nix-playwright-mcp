@@ -18,13 +18,17 @@ let
       }
     else
       playwright-driver.browsers;
+
+  versionSpec = (lib.importJSON ./package.json).dependencies."@playwright/mcp";
+
+  versionMatch = builtins.match "\\^([0-9]+(\\.[0-9]+)+)" versionSpec;
+
+  version = if versionMatch == null then "unknown" else builtins.elemAt versionMatch 0;
 in
 buildNpmPackage {
-  pname = "mcp-server-playwright";
-  version = "unknown";
-
-  src = ./.;
-  inherit npmDepsHash;
+  pname = "playwright-mcp";
+  src = lib.cleanSource ./.;
+  inherit version npmDepsHash;
 
   # The prepack script runs the build script, which we'd rather do in the build phase.
   npmPackFlags = [ "--ignore-scripts" ];
@@ -32,12 +36,10 @@ buildNpmPackage {
   dontNpmBuild = true;
 
   postInstall = ''
-    bin="$out/lib/node_modules/nix-playwright-server/node_modules/.bin"
+    bindir="$out/lib/node_modules/nix-playwright-server/node_modules/.bin"
 
-    executable="$(find -L '${browsers}' -name ${browserProgram} -type f)"
-
-    makeWrapper "$bin/mcp-server-playwright" $out/bin/mcp-server-playwright \
-      --chdir "$bin" \
+    makeWrapper $(realpath "$bindir/playwright-mcp") $out/bin/playwright-mcp \
+      --chdir "$bindir" \
       --add-flags "--executable-path '$executable'"
   '';
 
