@@ -18,13 +18,17 @@ let
       }
     else
       playwright-driver.browsers;
+
+  versionSpec = (lib.importJSON ./package.json).dependencies."@playwright/mcp";
+
+  versionMatch = builtins.match "\\^([0-9]+(\\.[0-9]+)+)" versionSpec;
+
+  version = if versionMatch == null then "unknown" else builtins.elemAt versionMatch 0;
 in
 buildNpmPackage {
   pname = "playwright-mcp";
-  version = "unknown";
-
   src = ./.;
-  inherit npmDepsHash;
+  inherit version npmDepsHash;
 
   # The prepack script runs the build script, which we'd rather do in the build phase.
   npmPackFlags = [ "--ignore-scripts" ];
