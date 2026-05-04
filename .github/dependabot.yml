@@ -21,6 +21,10 @@ updates:
     labels:
       - automation
       - dependencies
+    groups:
+      nix:
+        patterns:
+          - "nixpkgs"
 
   - package-ecosystem: npm
     directory: /
