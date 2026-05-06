@@ -16,8 +16,7 @@ updates:
   - package-ecosystem: nix
     directory: /
     schedule:
-      # TODO: Change to weekly once this setting has been confirmed to work
-      interval: daily
+      interval: weekly
     labels:
       - automation
       - dependencies
