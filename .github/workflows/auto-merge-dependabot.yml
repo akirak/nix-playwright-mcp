@@ -68,12 +68,12 @@ jobs:
         run: |
           git config credential.helper 'cache --timeout=300'
           fill_credential() {
-            cat <<EOF
-          protocol=https
-          host=github.com
-          username=x-access-token
-          password=$GITHUB_APP_TOKEN
-          EOF
+            printf '%s\n' \
+              protocol=https \
+              host=github.com \
+              username=x-access-token \
+              "password=$GITHUB_APP_TOKEN" \
+              ''
           }
           trap 'fill_credential | git credential reject' EXIT
           fill_credential | git credential approve
