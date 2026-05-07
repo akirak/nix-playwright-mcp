@@ -35,9 +35,6 @@ jobs:
           extra_nix_config: |
             access-tokens = github.com=${{ secrets.GITHUB_TOKEN }}
 
-      - name: Install the dependencies
-        run: npm ci --include=prod --ignore-scripts
-
       - name: Update
         run: nix develop .#ci -c prefetch-npm-deps package-lock.json > npm-hash.txt
 
