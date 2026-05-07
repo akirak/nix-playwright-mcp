@@ -66,8 +66,18 @@ jobs:
         env:
           GITHUB_APP_TOKEN: ${{ steps.generate-token.outputs.token }}
         run: |
-          git -c credential.helper='!f() { echo username=x-access-token; echo "password=$GITHUB_APP_TOKEN"; }; f' \
-            push --no-verify origin HEAD:${{ github.head_ref }}
+          git config credential.helper 'cache --timeout=300'
+          fill_credential() {
+            cat <<EOF
+          protocol=https
+          host=github.com
+          username=x-access-token
+          password=$GITHUB_APP_TOKEN
+          EOF
+          }
+          trap 'fill_credential | git credential reject' EXIT
+          fill_credential | git credential approve
+          git push --no-verify origin HEAD:${{ github.head_ref }}
 
   merge:
     needs: update
