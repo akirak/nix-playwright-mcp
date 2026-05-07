@@ -62,6 +62,7 @@ jobs:
       - if: steps.commit.outputs.changed == 'true'
         env:
           GITHUB_APP_TOKEN: ${{ steps.generate-token.outputs.token }}
+          HEAD_REF: ${{ github.head_ref }}
         run: |
           git config credential.helper 'cache --timeout=300'
           fill_credential() {
@@ -74,7 +75,7 @@ jobs:
           }
           trap 'fill_credential | git credential reject' EXIT
           fill_credential | git credential approve
-          git push --no-verify origin HEAD:${{ github.head_ref }}
+          git push --no-verify origin "HEAD:$HEAD_REF"
 
   merge:
     needs: update
