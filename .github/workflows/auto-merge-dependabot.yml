@@ -24,18 +24,11 @@ jobs:
       pull-requests: read
 
     steps:
-      - uses: actions/create-github-app-token@7989d206df2ffdd9fc88b0eb6d2f0eebee835fd6 # v3.1.1
-        id: generate-token
-        with:
-          app-id: ${{ secrets.CREATE_PR_APP_ID }}
-          private-key: ${{ secrets.CREATE_PR_APP_PRIVATE_KEY }}
-          permission-contents: write
-
       - uses: actions/checkout@de0fac2e4500dabe0009e67214ff5f5447ce83dd # v6
         with:
           repository: ${{ github.event.pull_request.head.repo.full_name }}
           ref: ${{ github.head_ref }}
-          token: ${{ steps.generate-token.outputs.token }}
+          persist-credentials: false
 
       - uses: cachix/install-nix-action@8aa03977d8d733052d78f4e008a241fd1dbf36b3 # v31
         with:
@@ -48,16 +41,33 @@ jobs:
       - name: Update
         run: nix develop .#ci -c prefetch-npm-deps package-lock.json > npm-hash.txt
 
-      - run: |
+      - id: commit
+        run: |
           git config user.name "github-actions[bot]"
           git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
           git add npm-hash.txt
           if git diff --cached --quiet; then
             echo "No changes to commit"
+            echo "changed=false" >> "$GITHUB_OUTPUT"
           else
             git commit --no-verify -m "chore: Updated the npm hash"
-            git push --no-verify
+            echo "changed=true" >> "$GITHUB_OUTPUT"
           fi
+
+      - uses: actions/create-github-app-token@7989d206df2ffdd9fc88b0eb6d2f0eebee835fd6 # v3.1.1
+        if: steps.commit.outputs.changed == 'true'
+        id: generate-token
+        with:
+          app-id: ${{ secrets.CREATE_PR_APP_ID }}
+          private-key: ${{ secrets.CREATE_PR_APP_PRIVATE_KEY }}
+          permission-contents: write
+
+      - if: steps.commit.outputs.changed == 'true'
+        env:
+          GITHUB_APP_TOKEN: ${{ steps.generate-token.outputs.token }}
+        run: |
+          git -c credential.helper='!f() { echo username=x-access-token; echo "password=$GITHUB_APP_TOKEN"; }; f' \
+            push --no-verify origin HEAD:${{ github.head_ref }}
 
   merge:
     needs: update
