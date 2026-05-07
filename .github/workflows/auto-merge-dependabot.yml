@@ -15,14 +15,28 @@ jobs:
   update:
     runs-on: ubuntu-latest
 
+    if: |
+      github.actor == 'dependabot[bot]' &&
+      github.event.pull_request.user.login == 'dependabot[bot]'
+
     permissions:
-      contents: write
+      contents: read
+      pull-requests: read
 
     steps:
+      - uses: actions/create-github-app-token@7989d206df2ffdd9fc88b0eb6d2f0eebee835fd6 # v3.1.1
+        id: generate-token
+        with:
+          app-id: ${{ secrets.CREATE_PR_APP_ID }}
+          private-key: ${{ secrets.CREATE_PR_APP_PRIVATE_KEY }}
+          permission-contents: write
+          permission-pull-requests: write
+
       - uses: actions/checkout@de0fac2e4500dabe0009e67214ff5f5447ce83dd # v6
         with:
           repository: ${{ github.event.pull_request.head.repo.full_name }}
           ref: ${{ github.head_ref }}
+          token: ${{ steps.generate-token.outputs.token }}
 
       - uses: cachix/install-nix-action@8aa03977d8d733052d78f4e008a241fd1dbf36b3 # v31
         with:
@@ -30,10 +44,10 @@ jobs:
             access-tokens = github.com=${{ secrets.GITHUB_TOKEN }}
 
       - name: Install the dependencies
-        run: npm ci --include=prod
+        run: npm ci --include=prod --ignore-scripts
 
       - name: Update
-        run: nix develop .#ci -c ./update.bash
+        run: nix develop .#ci -c prefetch-npm-deps package-lock.json > npm-hash.txt
 
       - run: |
           git config user.name "github-actions[bot]"
@@ -42,8 +56,8 @@ jobs:
           if git diff --cached --quiet; then
             echo "No changes to commit"
           else
-            git commit -m "chore: Updated the npm hash"
-            git push
+            git commit --no-verify -m "chore: Updated the npm hash"
+            git push --no-verify
           fi
 
   merge:
