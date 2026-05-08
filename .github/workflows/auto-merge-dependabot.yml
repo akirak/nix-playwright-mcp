@@ -51,7 +51,7 @@ jobs:
             echo "changed=true" >> "$GITHUB_OUTPUT"
           fi
 
-      - uses: actions/create-github-app-token@7989d206df2ffdd9fc88b0eb6d2f0eebee835fd6 # v3.1.1
+      - uses: actions/create-github-app-token@43e5c345bfd4d4f3ecea019ad0042001a09dd857 # v3.1.1
         if: steps.commit.outputs.changed == 'true'
         id: generate-token
         with:
@@ -90,7 +90,7 @@ jobs:
       pull-requests: read
 
     steps:
-      - uses: actions/create-github-app-token@7989d206df2ffdd9fc88b0eb6d2f0eebee835fd6 # v3.1.1
+      - uses: actions/create-github-app-token@43e5c345bfd4d4f3ecea019ad0042001a09dd857 # v3.1.1
         id: generate-token
         with:
           app-id: ${{ secrets.CREATE_PR_APP_ID }}
