@@ -1,7 +1,6 @@
 # A Nix Flake for Playwright MCP
-**Deprecated**: This repository was a workaround for complex usage in the former
-Playwright MCP server. This is no longer necessary in the current version of
-Playwright MCP, which can be run simply using `npx`.
+**Deprecated**: Use `playwright-mcp` package from nixpkgs instead. This
+repository is no longer maintained.
 
 This repository now only provides a Nix-wrapped version of the Playwright MCP
 server, with the browser executable set to Chromium from Nixpkgs. I am still
